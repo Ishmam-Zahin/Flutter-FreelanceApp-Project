@@ -25,8 +25,12 @@ class AuthUserRepository implements IAuthUserRepository {
   });
 
   @override
-  Future<MyAuthUser> getAuthUser(String email, String password) {
-    return authUserProvider.getUser(email, password);
+  Future<MyAuthUser> getAuthUser(String email, String password) async {
+    try {
+      return authUserProvider.getUser(email, password);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
   }
 
   @override

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/image_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/bloc/events/user_event.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
+import 'package:freelance_app/data/repository/auth_user_repository.dart';
 import 'package:freelance_app/signup_page.dart';
 import 'package:get/get.dart';
 
@@ -156,7 +158,14 @@ class _LoginPageState extends State<LoginPage> {
                       const Text('Don\'t have an account?'),
                       TextButton(
                         onPressed: () {
-                          Get.to(() => const SignUpPage());
+                          Get.to(
+                            () => BlocProvider(
+                              create: (context) => MyImageBloc(
+                                context.read<AuthUserRepository>(),
+                              ),
+                              child: const SignUpPage(),
+                            ),
+                          );
                         },
                         child: const Text('SIGN UP'),
                       )
