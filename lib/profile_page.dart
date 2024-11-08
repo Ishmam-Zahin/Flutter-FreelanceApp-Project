@@ -10,6 +10,16 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'HireHub',
+          style: TextStyle(
+            fontFamily: 'Wet',
+            fontSize: 34,
+          ),
+        ),
+        backgroundColor: Colors.blue,
+      ),
       body: BlocBuilder<AuthUserBloc, UserState>(builder: (context, state) {
         final user = state as AuthenticateUserSate;
         return Padding(

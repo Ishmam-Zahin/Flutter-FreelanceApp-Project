@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:freelance_app/add_job_page.dart';
+import 'package:freelance_app/bloc/blocs/add_job_bloc.dart';
 import 'package:freelance_app/bloc/blocs/home_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
+import 'package:freelance_app/bloc/blocs/job_types_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/bloc/events/home_page_events.dart';
 import 'package:freelance_app/bloc/events/user_event.dart';
@@ -23,16 +25,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
-        ),
-        backgroundColor: Colors.blue,
-      ),
       body: BlocBuilder<HomePageBloc, MyHomePageStates>(
           builder: (context, state) {
         if (state is ShowProfilePageState) {
@@ -42,12 +34,35 @@ class _HomePageState extends State<HomePage> {
           return const SearchPage();
         }
         if (state is ShowAddJobPageState) {
-          return const AddJobPage();
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => JobTypesBloc(
+                  homePageRepository: context.read<HomePageRepository>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => AddJobBloc(
+                  homePageRepository: context.read<HomePageRepository>(),
+                ),
+              ),
+            ],
+            child: const AddJobPage(),
+          );
         }
-        return BlocProvider(
-          create: (context) => JobListPageBloc(
-            context.read<HomePageRepository>(),
-          ),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => JobListPageBloc(
+                context.read<HomePageRepository>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => JobTypesBloc(
+                homePageRepository: context.read<HomePageRepository>(),
+              ),
+            ),
+          ],
           child: const JobListPage(),
         );
       }),

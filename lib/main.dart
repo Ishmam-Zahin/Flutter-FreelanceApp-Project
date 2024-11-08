@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freelance_app/auth_wrapper.dart';
-import 'package:freelance_app/bloc/blocs/home_page_bloc.dart';
-import 'package:freelance_app/bloc/blocs/image_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/data/providers/auth_user_provider.dart';
 import 'package:freelance_app/data/providers/image_provider.dart';
@@ -39,12 +37,6 @@ class MyApp extends StatelessWidget {
               context.read<AuthUserRepository>(),
             ),
           ),
-          // BlocProvider(
-          //   lazy: false,
-          //   create: (context) => MyImageBloc(
-          //     context.read<AuthUserRepository>(),
-          //   ),
-          // ),
         ],
         child: GetMaterialApp(
           title: 'Freelance App',

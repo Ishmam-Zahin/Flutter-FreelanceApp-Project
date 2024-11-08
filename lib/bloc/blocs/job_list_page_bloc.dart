@@ -9,7 +9,8 @@ class JobListPageBloc extends Bloc<MyJobListPageEvents, MyJobListPageStates> {
     on<LoadJobListEvent>((event, emitter) async {
       try {
         emit(JobListLoadingState());
-        emit(JobListLoadedState(await _homePageRepository.getJobList()));
+        emit(JobListLoadedState(
+            await _homePageRepository.getJobList(event.typeId)));
       } catch (e) {
         emit(JobListErrorState(e.toString()));
       }
