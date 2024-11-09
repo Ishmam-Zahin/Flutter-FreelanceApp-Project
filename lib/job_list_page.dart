@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_types_bloc.dart';
+import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
 import 'package:freelance_app/bloc/events/job_list_page_events.dart';
 import 'package:freelance_app/bloc/events/job_types_events.dart';
 import 'package:freelance_app/bloc/states/job_list_page_states.dart';
 import 'package:freelance_app/bloc/states/job_types_states.dart';
+import 'package:freelance_app/data/repository/home_page_repository.dart';
+import 'package:freelance_app/job_details_page.dart';
+import 'package:get/get.dart';
 
 class JobListPage extends StatelessWidget {
   const JobListPage({super.key});
@@ -75,68 +80,93 @@ class JobListPage extends StatelessWidget {
                 itemBuilder: (context, count) {
                   return SizedBox(
                     height: 190,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Image.network(
-                              jobs[count]['user_image_url'],
-                              width: 90,
-                              height: 90,
-                              fit: BoxFit.cover,
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => JobDetailBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => SendMailBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              ),
+                            ],
+                            child: JobDetailsPage(
+                              jobId: jobs[count]['id'],
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                              height: 70,
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                    width: 2,
-                                    color: Colors.black,
+                          ),
+                        );
+                      },
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image.network(
+                                jobs[count]['user_image_url'],
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                height: 70,
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 2,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    jobs[count]['title'],
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    jobs[count]['type_name'],
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                  Text(
-                                    jobs[count]['dsc'],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 3,
-                                  )
-                                ],
+                              const SizedBox(
+                                width: 10,
                               ),
-                            )
-                          ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      jobs[count]['title'],
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      jobs[count]['type_name'],
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    Text(
+                                      jobs[count]['dsc'],
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

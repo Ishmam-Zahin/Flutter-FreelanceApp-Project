@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freelance_app/auth_wrapper.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
+import 'package:freelance_app/data/providers/add_job_provider.dart';
 import 'package:freelance_app/data/providers/auth_user_provider.dart';
 import 'package:freelance_app/data/providers/image_provider.dart';
+import 'package:freelance_app/data/providers/job_detail_provider.dart';
+import 'package:freelance_app/data/providers/job_list_provider.dart';
+import 'package:freelance_app/data/providers/job_types_provider.dart';
+import 'package:freelance_app/data/providers/send_mail_provider.dart';
 import 'package:freelance_app/data/repository/auth_user_repository.dart';
+import 'package:freelance_app/data/repository/home_page_repository.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -24,11 +30,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthUserRepository(
-        authUserProvider: AuthUserProvider(),
-        myImageProvider: MyImageProvider(),
-      ),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => AuthUserRepository(
+            authUserProvider: AuthUserProvider(),
+            myImageProvider: MyImageProvider(),
+          ),
+        ),
+        RepositoryProvider(
+          create: (context) => HomePageRepository(
+            myJobListProvider: MyJobListProvider(),
+            myJobTypesProvider: MyJobTypesProvider(),
+            myAddJobprovider: MyAddJobprovider(),
+            myJobDetailProvider: MyJobDetailProvider(),
+            mySendMailProvider: MySendMailProvider(),
+          ),
+        ),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(

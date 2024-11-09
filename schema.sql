@@ -10,17 +10,76 @@ CREATE TABLE jobs(
   foreign key (user_id) references auth.users(id),
   foreign key (type_id) references job_types(id)
 );
+
 create table job_types(
   id int primary key generated always as identity,
   type_name varchar(100) not null
 );
 
-insert into jobs(title, user_id, deadline_date, dsc)
-values
-('web devloper', 'cff43359-8158-4855-9345-50cee9dd15d2', '2021-12-30', 'i need a programmer'),
-('web devloper', 'cff43359-8158-4855-9345-50cee9dd15d2', '2021-12-30', 'i need a programmer'),
-('web devloper', '497a28cf-c41c-483c-922b-eae87f3025bd', '2021-12-30', 'i need a programmer');
-
 create view get_job_list as
 select A.id, C.id as type_id, C.type_name, A.title, A.dsc, B.raw_user_meta_data->'name' as user_name, B.raw_user_meta_data->'image_url' as user_image_url
 from (jobs as A join auth.users as B on A.user_id = B.id) join job_types as C on A.type_id = C.id;
+
+
+CREATE FUNCTION get_job_detail(j_id int)
+RETURNS TABLE(
+    id bigint,
+    user_id uuid,
+    type_id int,
+    title varchar,
+    upload_date date,
+    deadline_date date,
+    description text,
+    total_applicant int,
+    active boolean,
+    user_image text,
+    name text,
+    address text,
+    user_email varchar
+) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        j.id,
+        j.user_id,
+        j.type_id,
+        j.title,
+        j.upload_date,
+        j.deadline_date,
+        j.dsc AS description,
+        j.total_applicant,
+        j.active,
+        u.raw_user_meta_data->>'image_url' AS user_image,
+        u.raw_user_meta_data->>'name' as name,
+        u.raw_user_meta_data->>'address' as address,
+        u.email as user_email
+    FROM jobs AS j
+    JOIN auth.users AS u ON j.user_id = u.id
+    WHERE j.id = j_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+create table job_applicant(
+  user_id uuid,
+  job_id bigint,
+  apply_date date default current_date,
+  foreign key (user_id) references auth.users(id) on delete cascade,
+  foreign key (job_id) references jobs(id) on delete cascade
+);
+
+create function auto_increment_applicant_num()
+returns trigger as
+$$
+begin
+update jobs
+set total_applicant = total_applicant + 1
+where id = new.job_id;
+
+return new;
+end;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+create trigger aftre_insert_jobapplicant
+after insert on job_applicant
+for each row execute function auto_increment_applicant_num();

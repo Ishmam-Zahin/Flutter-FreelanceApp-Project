@@ -4,6 +4,7 @@ import 'package:freelance_app/bloc/blocs/home_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
+import 'package:freelance_app/data/providers/job_detail_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
@@ -25,20 +26,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
         if (state is AuthenticateUserSate) {
           return BlocProvider(
             create: (context) => HomePageBloc(),
-            child: RepositoryProvider(
-              create: (context) => HomePageRepository(
-                myJobListProvider: MyJobListProvider(),
-                myJobTypesProvider: MyJobTypesProvider(),
-                myAddJobprovider: MyAddJobprovider(),
-              ),
-              child: MultiBlocProvider(
-                providers: [
-                  BlocProvider(
-                    create: (context) => HomePageBloc(),
-                  ),
-                ],
-                child: const HomePage(),
-              ),
+            child: BlocProvider(
+              create: (context) => HomePageBloc(),
+              child: const HomePage(),
             ),
           );
         }
