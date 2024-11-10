@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_types_bloc.dart';
+import 'package:freelance_app/bloc/blocs/post_job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
+import 'package:freelance_app/bloc/blocs/send_mail_validity_bloc.dart';
 import 'package:freelance_app/bloc/events/job_list_page_events.dart';
 import 'package:freelance_app/bloc/events/job_types_events.dart';
 import 'package:freelance_app/bloc/states/job_list_page_states.dart';
@@ -93,6 +96,24 @@ class JobListPage extends StatelessWidget {
                               ),
                               BlocProvider(
                                 create: (context) => SendMailBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => JobCommentBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => PostJobCommentBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => SendMailValidityBloc(
                                   homePageRepository:
                                       context.read<HomePageRepository>(),
                                 ),

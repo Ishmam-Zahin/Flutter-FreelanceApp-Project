@@ -11,3 +11,13 @@ class SendMailEvent extends MySendMailEvents {
     required this.jobId,
   });
 }
+
+class SendMailValidityCheckEvent extends MySendMailEvents {
+  final String userId;
+  final int jobId;
+
+  SendMailValidityCheckEvent({
+    required this.userId,
+    required this.jobId,
+  });
+}

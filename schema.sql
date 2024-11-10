@@ -11,6 +11,16 @@ CREATE TABLE jobs(
   foreign key (type_id) references job_types(id)
 );
 
+create table comments(
+  id bigint generated always as identity primary key,
+  user_id uuid,
+  job_id bigint,
+  com_time timestamp default current_timestamp,
+  com_text varchar(200) not null,
+  foreign key (user_id) references auth.users(id) on delete cascade,
+  foreign key (job_id) references jobs(id)
+);
+
 create table job_types(
   id int primary key generated always as identity,
   type_name varchar(100) not null
@@ -83,3 +93,37 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 create trigger aftre_insert_jobapplicant
 after insert on job_applicant
 for each row execute function auto_increment_applicant_num();
+
+
+CREATE FUNCTION get_comments(jobId bigint)
+RETURNS TABLE(
+  id bigint,
+  user_id uuid,
+  job_id bigint,
+  com_time timestamp,
+  com_text varchar,
+  user_name text,
+  user_image text
+)
+AS
+$$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    C.id, 
+    C.user_id, 
+    C.job_id, 
+    C.com_time, 
+    C.com_text, 
+    B.raw_user_meta_data->>'name' AS user_name, 
+    B.raw_user_meta_data->>'image_url' AS user_image
+  FROM 
+    jobs J
+  JOIN 
+    comments C ON J.id = C.job_id
+  JOIN 
+    auth.users B ON C.user_id = B.id
+  WHERE 
+    J.id = jobId;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

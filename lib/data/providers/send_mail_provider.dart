@@ -22,4 +22,27 @@ class MySendMailProvider {
       return Future.error(e.toString());
     }
   }
+
+  Future<bool> isValid({
+    required String userId,
+    required int jobId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> response = await Supabase.instance.client
+          .from('job_applicant')
+          .select()
+          .eq('user_id', userId)
+          .eq('job_id', jobId);
+      print(response);
+      print(userId);
+      print(jobId);
+      if (response.isEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
 }

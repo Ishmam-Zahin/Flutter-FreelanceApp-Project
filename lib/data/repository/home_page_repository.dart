@@ -1,7 +1,9 @@
+import 'package:freelance_app/data/model/job_comments_model.dart';
 import 'package:freelance_app/data/model/job_detail_model.dart';
 import 'package:freelance_app/data/model/job_list_model.dart';
 import 'package:freelance_app/data/model/jobs_types_model.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
+import 'package:freelance_app/data/providers/job_comments_provider.dart';
 import 'package:freelance_app/data/providers/job_detail_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
@@ -26,6 +28,19 @@ abstract class IHomePageRepository {
     required String userId,
     required int jobId,
   });
+
+  Future<bool> applyJobValidity({
+    required String userId,
+    required int jobId,
+  });
+
+  Future<MyJobCommentsModel> getComments({required int jobId});
+
+  Future<void> postComment({
+    required String userId,
+    required jobId,
+    required String comTxt,
+  });
 }
 
 class HomePageRepository implements IHomePageRepository {
@@ -34,6 +49,7 @@ class HomePageRepository implements IHomePageRepository {
   final MyAddJobprovider myAddJobprovider;
   final MyJobDetailProvider myJobDetailProvider;
   final MySendMailProvider mySendMailProvider;
+  final MyJobCommentsProvider myJobCommentsProvider;
 
   HomePageRepository({
     required this.myJobListProvider,
@@ -41,6 +57,7 @@ class HomePageRepository implements IHomePageRepository {
     required this.myAddJobprovider,
     required this.myJobDetailProvider,
     required this.mySendMailProvider,
+    required this.myJobCommentsProvider,
   });
 
   @override
@@ -101,6 +118,41 @@ class HomePageRepository implements IHomePageRepository {
     try {
       await mySendMailProvider.sendMail(
           userEmail: userEmail, userId: userId, jobId: jobId);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<MyJobCommentsModel> getComments({required int jobId}) async {
+    try {
+      return await myJobCommentsProvider.getCommets(jobId: jobId);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<void> postComment({
+    required String userId,
+    required jobId,
+    required String comTxt,
+  }) async {
+    try {
+      await myJobCommentsProvider.postComment(
+          userId: userId, jobId: jobId, comTxt: comTxt);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<bool> applyJobValidity({
+    required String userId,
+    required int jobId,
+  }) async {
+    try {
+      return await mySendMailProvider.isValid(userId: userId, jobId: jobId);
     } catch (e) {
       return Future.error(e.toString());
     }

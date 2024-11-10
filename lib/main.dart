@@ -5,6 +5,7 @@ import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
 import 'package:freelance_app/data/providers/auth_user_provider.dart';
 import 'package:freelance_app/data/providers/image_provider.dart';
+import 'package:freelance_app/data/providers/job_comments_provider.dart';
 import 'package:freelance_app/data/providers/job_detail_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
             myAddJobprovider: MyAddJobprovider(),
             myJobDetailProvider: MyJobDetailProvider(),
             mySendMailProvider: MySendMailProvider(),
+            myJobCommentsProvider: MyJobCommentsProvider(),
           ),
         ),
       ],

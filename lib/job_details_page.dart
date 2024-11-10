@@ -1,18 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
+import 'package:freelance_app/bloc/blocs/post_job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
+import 'package:freelance_app/bloc/blocs/send_mail_validity_bloc.dart';
+import 'package:freelance_app/bloc/blocs/user_bloc.dart';
+import 'package:freelance_app/bloc/events/job_comments_events.dart';
 import 'package:freelance_app/bloc/events/job_detail_events.dart';
 import 'package:freelance_app/bloc/events/send_mail_events.dart';
+import 'package:freelance_app/bloc/states/job_comments_states.dart';
 import 'package:freelance_app/bloc/states/job_detail_states.dart';
 import 'package:freelance_app/bloc/states/send_mail_states.dart';
+import 'package:freelance_app/bloc/states/user_state.dart';
 
-class JobDetailsPage extends StatelessWidget {
+class JobDetailsPage extends StatefulWidget {
   final int jobId;
+
   const JobDetailsPage({
     super.key,
     required this.jobId,
   });
+
+  @override
+  State<JobDetailsPage> createState() => _JobDetailsPageState();
+}
+
+class _JobDetailsPageState extends State<JobDetailsPage> {
+  final _postCommentFormKey = GlobalKey<FormState>();
+  String? _comTxt;
+
+  void _showErrorSnackBar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +56,9 @@ class JobDetailsPage extends StatelessWidget {
         listener: (context, state) {},
         builder: (context, state) {
           if (state is JobDetailInitialState) {
-            context.read<JobDetailBloc>().add(LoadJobDetailEvent(jobId: jobId));
+            context
+                .read<JobDetailBloc>()
+                .add(LoadJobDetailEvent(jobId: widget.jobId));
           }
 
           if (state is JobDetailErrorState) {
@@ -199,44 +226,82 @@ class JobDetailsPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                BlocBuilder<SendMailBloc, MySendMailStates>(
-                                  builder: (context, state2) {
-                                    if (state2 is SendMailLoadedState) {
+                                BlocBuilder<SendMailValidityBloc,
+                                        MySendMailStates>(
+                                    builder: (context, state3) {
+                                  if (state3 is SendMailValidityInitialState) {
+                                    final AuthenticateUserSate userState =
+                                        context.read<AuthUserBloc>().state
+                                            as AuthenticateUserSate;
+                                    final String userId =
+                                        userState.myAuthUser.userId;
+                                    context.read<SendMailValidityBloc>().add(
+                                          SendMailValidityCheckEvent(
+                                              userId: userId,
+                                              jobId: widget.jobId),
+                                        );
+                                  }
+                                  if (state3 is SendMailValidityLoadingState) {
+                                    return const CircularProgressIndicator();
+                                  }
+                                  if (state3 is SendMailValidityLoadedState) {
+                                    if (!state3.isValid) {
                                       return const Center(
                                         child: Text(
-                                          'Applied Successfully!',
+                                          'Already Applied!',
                                           style: TextStyle(
                                             color: Colors.green,
                                           ),
                                         ),
                                       );
                                     }
-                                    return Center(
-                                      child: ElevatedButton(
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              WidgetStatePropertyAll(
-                                            Colors.green[400],
+                                  }
+                                  return BlocBuilder<SendMailBloc,
+                                      MySendMailStates>(
+                                    builder: (context, state2) {
+                                      if (state2 is SendMailLoadedState) {
+                                        return const Center(
+                                          child: Text(
+                                            'Applied Successfully!',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                            ),
                                           ),
+                                        );
+                                      }
+                                      return Center(
+                                        child: ElevatedButton(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                              Colors.green[400],
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            final String userEmail =
+                                                job['user_email'];
+                                            final AuthenticateUserSate
+                                                userState = context
+                                                        .read<AuthUserBloc>()
+                                                        .state
+                                                    as AuthenticateUserSate;
+                                            final String userId =
+                                                userState.myAuthUser.userId;
+                                            final int jobId = job['id'];
+                                            context.read<SendMailBloc>().add(
+                                                  SendMailEvent(
+                                                    userEmail: userEmail,
+                                                    userId: userId,
+                                                    jobId: jobId,
+                                                  ),
+                                                );
+                                          },
+                                          child: const Text('Apply Now'),
                                         ),
-                                        onPressed: () {
-                                          final String userEmail =
-                                              job['user_email'];
-                                          final String userId = job['user_id'];
-                                          final int jobId = job['id'];
-                                          context.read<SendMailBloc>().add(
-                                                SendMailEvent(
-                                                  userEmail: userEmail,
-                                                  userId: userId,
-                                                  jobId: jobId,
-                                                ),
-                                              );
-                                        },
-                                        child: const Text('Apply Now'),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                      );
+                                    },
+                                  );
+                                }),
                                 const SizedBox(
                                   height: 10,
                                 ),
@@ -283,6 +348,178 @@ class JobDetailsPage extends StatelessWidget {
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                      ),
+                      const Center(
+                          child: Text(
+                        'Comments',
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
+                      )),
+                      Card(
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Form(
+                                      key: _postCommentFormKey,
+                                      child: Expanded(
+                                        child: TextFormField(
+                                          decoration: const InputDecoration(
+                                            hintText: 'Enter your comment',
+                                            border: OutlineInputBorder(),
+                                            focusedBorder: OutlineInputBorder(),
+                                            enabledBorder: OutlineInputBorder(),
+                                            fillColor: Colors.white,
+                                            filled: true,
+                                          ),
+                                          onSaved: (value) {
+                                            _comTxt = value;
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    BlocConsumer<PostJobCommentBloc,
+                                        MyJobCommentsStates>(
+                                      listener: (context, state) {
+                                        if (state
+                                            is PostJobCommentLoadedState) {
+                                          _showErrorSnackBar(
+                                              context,
+                                              'Comment posted successfully!',
+                                              Colors.green);
+                                        }
+
+                                        if (state is PostJobCommentErrorState) {
+                                          _showErrorSnackBar(
+                                              context, state.error, Colors.red);
+                                        }
+                                      },
+                                      builder: (context, state) {
+                                        return ElevatedButton(
+                                          onPressed: () {
+                                            if (_postCommentFormKey
+                                                .currentState!
+                                                .validate()) {
+                                              _postCommentFormKey.currentState!
+                                                  .save();
+                                              final AuthenticateUserSate
+                                                  userState = context
+                                                          .read<AuthUserBloc>()
+                                                          .state
+                                                      as AuthenticateUserSate;
+                                              final String userId =
+                                                  userState.myAuthUser.userId;
+
+                                              context
+                                                  .read<PostJobCommentBloc>()
+                                                  .add(
+                                                    PostCommentEvent(
+                                                        userId: userId,
+                                                        jobId: widget.jobId,
+                                                        comTxt: _comTxt!),
+                                                  );
+                                            }
+                                          },
+                                          child: state
+                                                  is PostJobCommentLoadingState
+                                              ? const CircularProgressIndicator()
+                                              : const Text('POST'),
+                                        );
+                                      },
+                                    )
+                                  ],
+                                ),
+                              ),
+                              BlocConsumer<JobCommentBloc, MyJobCommentsStates>(
+                                  listener: (context, state) {},
+                                  builder: (context, state) {
+                                    if (state is JobCommentsErrorState) {
+                                      return Text(state.error);
+                                    }
+                                    if (state is JobCommentsInitialState) {
+                                      context.read<JobCommentBloc>().add(
+                                          LoadCommentsEvent(
+                                              jobId: widget.jobId));
+                                    }
+                                    if (state is JobCommentsLoadedState) {
+                                      final comments = state.comments.comments;
+                                      return SizedBox(
+                                        width: double.infinity,
+                                        child: Column(
+                                          children: List.generate(
+                                            comments.length,
+                                            (count) {
+                                              return SizedBox(
+                                                width: double.infinity,
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Image.network(
+                                                      comments[count]
+                                                          ['user_image'],
+                                                      width: 60,
+                                                      height: 60,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            comments[count]
+                                                                ['user_name'],
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            comments[count]
+                                                                ['com_time'],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            comments[count]
+                                                                ['com_text'],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 20,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const CircularProgressIndicator();
+                                  })
+                            ],
                           ),
                         ),
                       ),
