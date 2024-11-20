@@ -5,12 +5,13 @@ import 'package:freelance_app/data/model/jobs_types_model.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
 import 'package:freelance_app/data/providers/job_comments_provider.dart';
 import 'package:freelance_app/data/providers/job_detail_provider.dart';
+import 'package:freelance_app/data/providers/job_isActive_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
 import 'package:freelance_app/data/providers/send_mail_provider.dart';
 
 abstract class IHomePageRepository {
-  Future<MyJobListModel> getJobList(int typeId);
+  Future<MyJobListModel> getJobList(int typeId, {String? userId});
   Future<MyjobTypesModel> getJobTypes();
   Future<void> uploadJob({
     required String title,
@@ -41,6 +42,11 @@ abstract class IHomePageRepository {
     required jobId,
     required String comTxt,
   });
+
+  Future<void> changeJobState({
+    required int jobId,
+    required bool status,
+  });
 }
 
 class HomePageRepository implements IHomePageRepository {
@@ -50,6 +56,7 @@ class HomePageRepository implements IHomePageRepository {
   final MyJobDetailProvider myJobDetailProvider;
   final MySendMailProvider mySendMailProvider;
   final MyJobCommentsProvider myJobCommentsProvider;
+  final MyJobIsActiveProvider myJobIsActiveProvider;
 
   HomePageRepository({
     required this.myJobListProvider,
@@ -58,12 +65,13 @@ class HomePageRepository implements IHomePageRepository {
     required this.myJobDetailProvider,
     required this.mySendMailProvider,
     required this.myJobCommentsProvider,
+    required this.myJobIsActiveProvider,
   });
 
   @override
-  Future<MyJobListModel> getJobList(int typeId) async {
+  Future<MyJobListModel> getJobList(int typeId, {String? userId}) async {
     try {
-      return await myJobListProvider.getJobList(typeId);
+      return await myJobListProvider.getJobList(typeId, userId: userId);
     } catch (e) {
       return Future.error(e.toString());
     }
@@ -153,6 +161,18 @@ class HomePageRepository implements IHomePageRepository {
   }) async {
     try {
       return await mySendMailProvider.isValid(userId: userId, jobId: jobId);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<void> changeJobState({
+    required int jobId,
+    required bool status,
+  }) async {
+    try {
+      await myJobIsActiveProvider.setJobActive(jobId: jobId, status: status);
     } catch (e) {
       return Future.error(e.toString());
     }

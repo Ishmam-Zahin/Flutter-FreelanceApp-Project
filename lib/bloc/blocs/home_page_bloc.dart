@@ -3,7 +3,7 @@ import 'package:freelance_app/bloc/events/home_page_events.dart';
 import 'package:freelance_app/bloc/states/home_page_states.dart';
 
 class HomePageBloc extends Bloc<MyHomePageEvents, MyHomePageStates> {
-  HomePageBloc() : super(ShowProfilePageState()) {
+  HomePageBloc() : super(ShowJobListPageState()) {
     on<LoadProfilePageEvent>((event, emitter) {
       emit(ShowProfilePageState());
     });

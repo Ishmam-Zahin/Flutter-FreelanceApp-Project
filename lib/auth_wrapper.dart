@@ -26,10 +26,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         if (state is AuthenticateUserSate) {
           return BlocProvider(
             create: (context) => HomePageBloc(),
-            child: BlocProvider(
-              create: (context) => HomePageBloc(),
-              child: const HomePage(),
-            ),
+            child: const HomePage(),
           );
         }
 

@@ -27,7 +27,7 @@ create table job_types(
 );
 
 create view get_job_list as
-select A.id, C.id as type_id, C.type_name, A.title, A.dsc, B.raw_user_meta_data->'name' as user_name, B.raw_user_meta_data->'image_url' as user_image_url
+select A.id, A.user_id, A.active, C.id as type_id, C.type_name, A.title, A.dsc, A.deadline_date, B.raw_user_meta_data->'name' as user_name, B.raw_user_meta_data->'image_url' as user_image_url
 from (jobs as A join auth.users as B on A.user_id = B.id) join job_types as C on A.type_id = C.id;
 
 

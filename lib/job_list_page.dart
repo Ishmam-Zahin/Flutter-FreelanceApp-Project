@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/change_job_isactive_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
@@ -118,6 +119,12 @@ class JobListPage extends StatelessWidget {
                                       context.read<HomePageRepository>(),
                                 ),
                               ),
+                              BlocProvider(
+                                create: (context) => ChangeJobIsActiveBloc(
+                                  homePageRepository:
+                                      context.read<HomePageRepository>(),
+                                ),
+                              )
                             ],
                             child: JobDetailsPage(
                               jobId: jobs[count]['id'],

@@ -28,7 +28,16 @@ class _HomePageState extends State<HomePage> {
       body: BlocBuilder<HomePageBloc, MyHomePageStates>(
           builder: (context, state) {
         if (state is ShowProfilePageState) {
-          return const ProfilePage();
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => JobListPageBloc(
+                  context.read<HomePageRepository>(),
+                ),
+              )
+            ],
+            child: const ProfilePage(),
+          );
         }
         if (state is ShowSearchPageState) {
           return const SearchPage();

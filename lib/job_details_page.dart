@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/blocs/change_job_isactive_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/post_job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_validity_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
+import 'package:freelance_app/bloc/events/change_job_isactive_events.dart';
 import 'package:freelance_app/bloc/events/job_comments_events.dart';
 import 'package:freelance_app/bloc/events/job_detail_events.dart';
 import 'package:freelance_app/bloc/events/send_mail_events.dart';
+import 'package:freelance_app/bloc/states/change_job_isActive_states.dart';
 import 'package:freelance_app/bloc/states/job_comments_states.dart';
 import 'package:freelance_app/bloc/states/job_detail_states.dart';
 import 'package:freelance_app/bloc/states/send_mail_states.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
+import 'package:image_picker/image_picker.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final int jobId;
@@ -41,6 +45,9 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthenticateUserSate userState =
+        context.read<AuthUserBloc>().state as AuthenticateUserSate;
+    final String userId = userState.myAuthUser.userId;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -226,81 +233,152 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                BlocBuilder<SendMailValidityBloc,
-                                        MySendMailStates>(
-                                    builder: (context, state3) {
-                                  if (state3 is SendMailValidityInitialState) {
-                                    final AuthenticateUserSate userState =
-                                        context.read<AuthUserBloc>().state
-                                            as AuthenticateUserSate;
-                                    final String userId =
-                                        userState.myAuthUser.userId;
-                                    context.read<SendMailValidityBloc>().add(
-                                          SendMailValidityCheckEvent(
-                                              userId: userId,
-                                              jobId: widget.jobId),
-                                        );
-                                  }
-                                  if (state3 is SendMailValidityLoadingState) {
-                                    return const CircularProgressIndicator();
-                                  }
-                                  if (state3 is SendMailValidityLoadedState) {
-                                    if (!state3.isValid) {
-                                      return const Center(
-                                        child: Text(
-                                          'Already Applied!',
-                                          style: TextStyle(
-                                            color: Colors.green,
+                                Builder(builder: (context) {
+                                  if (userId == job['user_id']) {
+                                    return BlocConsumer<ChangeJobIsActiveBloc,
+                                        MyChangeJobIsActiveState>(
+                                      listener: (context, state) {
+                                        if (state
+                                            is ChangeJobIsActiveErrorState) {
+                                          _showErrorSnackBar(
+                                              context, state.error, Colors.red);
+                                        }
+                                        if (state
+                                            is ChangeJobIsActiveLoadedState) {
+                                          _showErrorSnackBar(
+                                              context,
+                                              "Changed Successfully!",
+                                              Colors.green);
+                                          context.read<JobDetailBloc>().add(
+                                              LoadJobDetailEvent(
+                                                  jobId: widget.jobId));
+                                        }
+                                      },
+                                      builder: (context, state) => Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 130,
+                                            child: ListTile(
+                                              title: const Text(
+                                                'ON',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                              leading: Radio(
+                                                value: true,
+                                                groupValue: job['active'],
+                                                onChanged: (value) {
+                                                  context
+                                                      .read<
+                                                          ChangeJobIsActiveBloc>()
+                                                      .add(
+                                                          ChangeMyJobIsActiveEvent(
+                                                              jobId:
+                                                                  widget.jobId,
+                                                              status: true));
+                                                },
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    }
+                                          SizedBox(
+                                            width: 140,
+                                            child: ListTile(
+                                              title: const Text(
+                                                'OFF',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              leading: Radio(
+                                                value: false,
+                                                groupValue: job['active'],
+                                                onChanged: (value) {
+                                                  context
+                                                      .read<
+                                                          ChangeJobIsActiveBloc>()
+                                                      .add(
+                                                          ChangeMyJobIsActiveEvent(
+                                                              jobId:
+                                                                  widget.jobId,
+                                                              status: false));
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
                                   }
-                                  return BlocBuilder<SendMailBloc,
-                                      MySendMailStates>(
-                                    builder: (context, state2) {
-                                      if (state2 is SendMailLoadedState) {
+                                  return BlocBuilder<SendMailValidityBloc,
+                                          MySendMailStates>(
+                                      builder: (context, state3) {
+                                    if (state3
+                                        is SendMailValidityInitialState) {
+                                      context.read<SendMailValidityBloc>().add(
+                                            SendMailValidityCheckEvent(
+                                                userId: userId,
+                                                jobId: widget.jobId),
+                                          );
+                                    }
+                                    if (state3
+                                        is SendMailValidityLoadingState) {
+                                      return const CircularProgressIndicator();
+                                    }
+                                    if (state3 is SendMailValidityLoadedState) {
+                                      if (!state3.isValid) {
                                         return const Center(
                                           child: Text(
-                                            'Applied Successfully!',
+                                            'Already Applied!',
                                             style: TextStyle(
                                               color: Colors.green,
                                             ),
                                           ),
                                         );
                                       }
-                                      return Center(
-                                        child: ElevatedButton(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStatePropertyAll(
-                                              Colors.green[400],
+                                    }
+                                    return BlocBuilder<SendMailBloc,
+                                        MySendMailStates>(
+                                      builder: (context, state2) {
+                                        if (state2 is SendMailLoadedState) {
+                                          return const Center(
+                                            child: Text(
+                                              'Applied Successfully!',
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                              ),
                                             ),
+                                          );
+                                        }
+                                        return Center(
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  WidgetStatePropertyAll(
+                                                Colors.green[400],
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              final String userEmail =
+                                                  job['user_email'];
+
+                                              final int jobId = job['id'];
+                                              context.read<SendMailBloc>().add(
+                                                    SendMailEvent(
+                                                      userEmail: userEmail,
+                                                      userId: userId,
+                                                      jobId: jobId,
+                                                    ),
+                                                  );
+                                            },
+                                            child: const Text('Apply Now'),
                                           ),
-                                          onPressed: () {
-                                            final String userEmail =
-                                                job['user_email'];
-                                            final AuthenticateUserSate
-                                                userState = context
-                                                        .read<AuthUserBloc>()
-                                                        .state
-                                                    as AuthenticateUserSate;
-                                            final String userId =
-                                                userState.myAuthUser.userId;
-                                            final int jobId = job['id'];
-                                            context.read<SendMailBloc>().add(
-                                                  SendMailEvent(
-                                                    userEmail: userEmail,
-                                                    userId: userId,
-                                                    jobId: jobId,
-                                                  ),
-                                                );
-                                          },
-                                          child: const Text('Apply Now'),
-                                        ),
-                                      );
-                                    },
-                                  );
+                                        );
+                                      },
+                                    );
+                                  });
                                 }),
                                 const SizedBox(
                                   height: 10,
