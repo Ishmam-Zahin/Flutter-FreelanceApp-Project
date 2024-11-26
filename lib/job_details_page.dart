@@ -16,7 +16,6 @@ import 'package:freelance_app/bloc/states/job_comments_states.dart';
 import 'package:freelance_app/bloc/states/job_detail_states.dart';
 import 'package:freelance_app/bloc/states/send_mail_states.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
-import 'package:image_picker/image_picker.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final int jobId;
@@ -50,14 +49,25 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     final String userId = userState.myAuthUser.userId;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 40,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: BlocConsumer<JobDetailBloc, MyJobDetailStates>(
         listener: (context, state) {},
@@ -90,53 +100,59 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         height: 20,
                       ),
                       Card(
+                        elevation: 5, // Add shadow for better elevation
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
+                        ),
                         child: SizedBox(
                           width: double.infinity,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(
+                                16.0), // Increased padding for better spacing
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Job Title
                                 Center(
                                   child: Text(
                                     job['title'],
                                     style: const TextStyle(
                                       fontSize: 28,
+                                      fontWeight: FontWeight
+                                          .bold, // Added bold for emphasis
+                                      color: Colors.black87,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
+                                const SizedBox(height: 16),
+
+                                // Job Info (Image, Name, Address)
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.network(
-                                      job['user_image'],
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    const SizedBox(
-                                      width: 15,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                      child: Container(
+                                    // User Image
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          8), // Rounded corners for the image
+                                      child: Image.network(
+                                        job['user_image'],
+                                        width: 80,
                                         height: 80,
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            left: BorderSide(
-                                              color: Colors.black,
-                                              width: 2,
-                                            ),
-                                          ),
-                                        ),
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 10,
+                                    const SizedBox(width: 16),
+
+                                    // Vertical Divider between Name & Address
+                                    Container(
+                                      height: 80,
+                                      width: 2,
+                                      color: Colors.grey.shade300,
                                     ),
+                                    const SizedBox(width: 16),
+
+                                    // Job Info (Name, Address)
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -145,31 +161,31 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                           job['name'],
                                           style: const TextStyle(
                                             fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
                                           ),
                                         ),
                                         Text(
                                           job['address'],
-                                        )
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 20,
-                                ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
                                   height: 10,
                                 ),
+
+                                // Divider (Job Details)
+                                Divider(color: Colors.grey.shade300),
+
+                                const SizedBox(height: 16),
+
+                                // Total Applicants
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -177,61 +193,64 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                       'Total Applicants: ',
                                       style: TextStyle(
                                         fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
                                       job['total_applicant'].toString(),
                                       style: const TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors
+                                            .blueAccent, // Adding a color to highlight it
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    const Icon(Icons.manage_accounts),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.manage_accounts,
+                                        size: 20, color: Colors.blueAccent),
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
+                                const SizedBox(height: 10),
+
+                                // Divider
+                                Divider(color: Colors.grey.shade300),
+
+                                const SizedBox(height: 16),
+
+                                // Description Title
                                 const Center(
                                   child: Text(
                                     'Description',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                const SizedBox(height: 16),
+
+                                // Job Description Text
                                 Text(
                                   job['description'],
                                   textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                const SizedBox(height: 20),
                               ],
                             ),
                           ),
                         ),
                       ),
                       Card(
+                        elevation: 5, // Add shadow for better elevation
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(12), // Rounded corners
+                        ),
                         child: SizedBox(
                           width: double.infinity,
                           child: Padding(
@@ -271,6 +290,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                 'ON',
                                                 style: TextStyle(
                                                   color: Colors.green,
+                                                  fontSize:
+                                                      16, // Adjusted font size for consistency
+                                                  fontWeight: FontWeight
+                                                      .w600, // Slightly bolder text
                                                 ),
                                               ),
                                               leading: Radio(
@@ -281,10 +304,11 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                       .read<
                                                           ChangeJobIsActiveBloc>()
                                                       .add(
-                                                          ChangeMyJobIsActiveEvent(
-                                                              jobId:
-                                                                  widget.jobId,
-                                                              status: true));
+                                                        ChangeMyJobIsActiveEvent(
+                                                          jobId: widget.jobId,
+                                                          status: true,
+                                                        ),
+                                                      );
                                                 },
                                               ),
                                             ),
@@ -296,6 +320,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                 'OFF',
                                                 style: TextStyle(
                                                   color: Colors.red,
+                                                  fontSize:
+                                                      16, // Adjusted font size for consistency
+                                                  fontWeight: FontWeight
+                                                      .w600, // Slightly bolder text
                                                 ),
                                               ),
                                               leading: Radio(
@@ -306,10 +334,11 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                       .read<
                                                           ChangeJobIsActiveBloc>()
                                                       .add(
-                                                          ChangeMyJobIsActiveEvent(
-                                                              jobId:
-                                                                  widget.jobId,
-                                                              status: false));
+                                                        ChangeMyJobIsActiveEvent(
+                                                          jobId: widget.jobId,
+                                                          status: false,
+                                                        ),
+                                                      );
                                                 },
                                               ),
                                             ),
@@ -339,7 +368,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                           child: Text(
                                             'Already Applied!',
                                             style: TextStyle(
-                                              color: Colors.green,
+                                              color: Colors.blueAccent,
+                                              fontSize: 20,
                                             ),
                                           ),
                                         );
@@ -353,17 +383,24 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                             child: Text(
                                               'Applied Successfully!',
                                               style: TextStyle(
-                                                color: Colors.green,
+                                                color: Colors.blueAccent,
+                                                fontSize: 20,
                                               ),
                                             ),
                                           );
                                         }
                                         return Center(
                                           child: ElevatedButton(
-                                            style: ButtonStyle(
+                                            style: const ButtonStyle(
+                                              padding: WidgetStatePropertyAll(
+                                                EdgeInsets.symmetric(
+                                                  vertical: 10,
+                                                  horizontal: 15,
+                                                ),
+                                              ),
                                               backgroundColor:
                                                   WidgetStatePropertyAll(
-                                                Colors.green[400],
+                                                Colors.blueAccent,
                                               ),
                                             ),
                                             onPressed: () {
@@ -379,7 +416,13 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                     ),
                                                   );
                                             },
-                                            child: const Text('Apply Now'),
+                                            child: const Text(
+                                              'Apply Now',
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
                                         );
                                       },
@@ -389,16 +432,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                Divider(color: Colors.grey.shade300),
                                 const SizedBox(
                                   height: 10,
                                 ),
@@ -412,7 +446,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                   height: 10,
                                 ),
                                 Text(
-                                  'Uploaded Date: ${job['deadline_date']}',
+                                  'Deadline Date: ${job['deadline_date']}',
                                   style: const TextStyle(
                                     fontSize: 16,
                                   ),
@@ -420,16 +454,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                Divider(color: Colors.grey.shade300),
                               ],
                             ),
                           ),
@@ -446,6 +471,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                         child: SizedBox(
                           width: double.infinity,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -455,13 +481,22 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                       key: _postCommentFormKey,
                                       child: Expanded(
                                         child: TextFormField(
-                                          decoration: const InputDecoration(
-                                            hintText: 'Enter your comment',
-                                            border: OutlineInputBorder(),
-                                            focusedBorder: OutlineInputBorder(),
-                                            enabledBorder: OutlineInputBorder(),
-                                            fillColor: Colors.white,
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter your comment...',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: const BorderSide(
+                                                  color: Colors.green),
+                                            ),
                                             filled: true,
+                                            fillColor: Colors.grey[100],
                                           ),
                                           onSaved: (value) {
                                             _comTxt = value;
@@ -469,9 +504,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
+                                    const SizedBox(width: 10),
                                     BlocConsumer<PostJobCommentBloc,
                                         MyJobCommentsStates>(
                                       listener: (context, state) {
@@ -481,12 +514,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                               context,
                                               'Comment posted successfully!',
                                               Colors.green);
-
                                           context.read<JobCommentBloc>().add(
                                               LoadCommentsEvent(
                                                   jobId: widget.jobId));
                                         }
-
                                         if (state is PostJobCommentErrorState) {
                                           _showErrorSnackBar(
                                               context, state.error, Colors.red);
@@ -512,101 +543,126 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                                   .read<PostJobCommentBloc>()
                                                   .add(
                                                     PostCommentEvent(
-                                                        userId: userId,
-                                                        jobId: widget.jobId,
-                                                        comTxt: _comTxt!),
+                                                      userId: userId,
+                                                      jobId: widget.jobId,
+                                                      comTxt: _comTxt!,
+                                                    ),
                                                   );
                                             }
                                           },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            backgroundColor: Colors.blueAccent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
                                           child: state
                                                   is PostJobCommentLoadingState
                                               ? const CircularProgressIndicator()
-                                              : const Text('POST'),
+                                              : const Text(
+                                                  'POST',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                         );
                                       },
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
+                              const Divider(
+                                color: Colors.grey,
+                                height: 1,
+                              ),
                               BlocConsumer<JobCommentBloc, MyJobCommentsStates>(
-                                  listener: (context, state) {},
-                                  builder: (context, state) {
-                                    if (state is JobCommentsErrorState) {
-                                      return Text(state.error);
-                                    }
-                                    if (state is JobCommentsInitialState) {
-                                      context.read<JobCommentBloc>().add(
+                                listener: (context, state) {},
+                                builder: (context, state) {
+                                  if (state is JobCommentsErrorState) {
+                                    return Text(state.error,
+                                        style:
+                                            const TextStyle(color: Colors.red));
+                                  }
+                                  if (state is JobCommentsInitialState) {
+                                    context.read<JobCommentBloc>().add(
                                           LoadCommentsEvent(
-                                              jobId: widget.jobId));
-                                    }
-                                    if (state is JobCommentsLoadedState) {
-                                      final comments = state.comments.comments;
-                                      return SizedBox(
-                                        width: double.infinity,
-                                        child: Column(
-                                          children: List.generate(
-                                            comments.length,
-                                            (count) {
-                                              return SizedBox(
-                                                width: double.infinity,
-                                                child: Row(
+                                              jobId: widget.jobId),
+                                        );
+                                  }
+                                  if (state is JobCommentsLoadedState) {
+                                    final comments = state.comments.comments;
+                                    return ListView.builder(
+                                      shrinkWrap:
+                                          true, // Makes the ListView scrollable within its parent
+                                      itemCount: comments.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                child: Image.network(
+                                                  comments[index]['user_image'],
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Image.network(
-                                                      comments[count]
-                                                          ['user_image'],
-                                                      width: 60,
-                                                      height: 60,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            comments[count]
-                                                                ['user_name'],
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            comments[count]
-                                                                ['com_time'],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          Text(
-                                                            comments[count]
-                                                                ['com_text'],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 20,
-                                                          )
-                                                        ],
+                                                    Text(
+                                                      comments[index]
+                                                          ['user_name'],
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
                                                       ),
-                                                    )
+                                                    ),
+                                                    Text(
+                                                      comments[index]
+                                                          ['com_time'],
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      comments[index]
+                                                          ['com_text'],
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
-                                              );
-                                            },
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      );
-                                    }
-                                    return const CircularProgressIndicator();
-                                  })
+                                        );
+                                      },
+                                    );
+                                  }
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                },
+                              ),
                             ],
                           ),
                         ),

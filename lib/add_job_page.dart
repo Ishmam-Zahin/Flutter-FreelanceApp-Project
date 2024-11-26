@@ -36,183 +36,209 @@ class _AddJobPageState extends State<AddJobPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
-        ),
-        backgroundColor: Colors.blue,
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
+        title: Row(
           children: [
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    const Text(
-                      'Upload A New Work',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    BlocBuilder<JobTypesBloc, MyJobTypesStates>(
-                      builder: (context, state) {
-                        if (state is JobTypesInitialState) {
-                          context.read<JobTypesBloc>().add(LoadJobTypesEvent());
-                        }
-                        if (state is JobTypesLoadedState) {
-                          final List<Map<String, dynamic>> types =
-                              state.myjobTypesModel.jobTypes;
-                          return DropdownButtonFormField(
-                            hint: const Text(
-                              'Select Catagory',
-                            ),
-                            items: List.generate(types.length, (count) {
-                              return DropdownMenuItem(
-                                value: types[count]['id'],
-                                child: Text(
-                                  types[count]['type_name'],
-                                ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              _typeId = value as int;
-                            },
-                            onSaved: (value) {
-                              _typeId = value as int;
-                            },
-                          );
-                        }
-                        return const CircularProgressIndicator();
-                      },
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Title'),
-                      ),
-                      validator: (value) {
-                        if (value == null || value == '') {
-                          return 'required field';
-                        }
-                        if (value.length <= 5) {
-                          return 'field must be greater than 5 characters';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _title = value;
-                      },
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: const InputDecoration(
-                        label: Text('Description'),
-                      ),
-                      validator: (value) {
-                        if (value == null || value == '') {
-                          return 'required field';
-                        }
-                        if (value.length <= 30) {
-                          return 'field must be greater than 30 characters';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _dsc = value;
-                      },
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('DeadLine Date'),
-                      ),
-                      validator: (value) {
-                        try {
-                          if (value == null || value == '') {
-                            return 'required field';
-                          }
-                          DateTime.parse(value);
-                          return null;
-                        } catch (e) {
-                          return 'Invalid Date';
-                        }
-                      },
-                      onSaved: (value) {
-                        _deadlineDate = value;
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
+            Image.asset(
+              'assets/images/logo.png',
               height: 40,
             ),
-            BlocConsumer<AddJobBloc, MyAddJobStates>(
-              listener: (context, state) {
-                if (state is AddJobLoadedState) {
-                  _showSnackBar(
-                    context,
-                    'JOB UPLOADED SUCCESSFULLY!',
-                    Colors.green,
-                  );
-                  _formKey.currentState!.reset();
-                }
-                if (state is AddJobErrorState) {
-                  _showSnackBar(
-                    context,
-                    state.error,
-                    Colors.red,
-                  );
-                }
-              },
-              builder: (context, state) => ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    final AuthenticateUserSate userState = context
-                        .read<AuthUserBloc>()
-                        .state as AuthenticateUserSate;
-                    final String userId = userState.myAuthUser.userId;
-                    context.read<AddJobBloc>().add(
-                          UploadJobEvent(
-                            title: _title!,
-                            dsc: _dsc!,
-                            deadlineDate: _deadlineDate!,
-                            userId: userId,
-                            typeId: _typeId!,
-                          ),
-                        );
-                  }
-                },
-                child: const Text('POST'),
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
+        ),
+        backgroundColor: Colors.white,
+        elevation: 1,
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 40),
+                const Center(
+                  child: Text(
+                    'Upload A New Work',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                BlocBuilder<JobTypesBloc, MyJobTypesStates>(
+                  builder: (context, state) {
+                    if (state is JobTypesInitialState) {
+                      context.read<JobTypesBloc>().add(LoadJobTypesEvent());
+                    }
+                    if (state is JobTypesLoadedState) {
+                      final List<Map<String, dynamic>> types =
+                          state.myjobTypesModel.jobTypes;
+                      return DropdownButtonFormField<int>(
+                        decoration: const InputDecoration(
+                          labelText: 'Select Category',
+                          border: OutlineInputBorder(),
+                        ),
+                        isExpanded: true,
+                        hint: const Text('Select Category'),
+                        items: List.generate(types.length, (count) {
+                          return DropdownMenuItem<int>(
+                            value: types[count]['id'],
+                            child: Text(types[count]['type_name']),
+                          );
+                        }),
+                        onChanged: (value) {
+                          setState(() {
+                            _typeId = value;
+                          });
+                        },
+                        onSaved: (value) {
+                          _typeId = value as int?;
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a category';
+                          }
+                          return null;
+                        },
+                      );
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+                const SizedBox(height: 30),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Title is required';
+                    }
+                    if (value.length <= 5) {
+                      return 'Title must be greater than 5 characters';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _title = value;
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  maxLines: 6, // Allows multiline input with increased height
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Description is required';
+                    }
+                    if (value.length <= 30) {
+                      return 'Description must be greater than 30 characters';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _dsc = value;
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Deadline Date',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Deadline Date is required';
+                    }
+                    try {
+                      DateTime.parse(value);
+                    } catch (_) {
+                      return 'Invalid Date';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _deadlineDate = value;
+                  },
+                ),
+                const SizedBox(height: 40),
+                BlocConsumer<AddJobBloc, MyAddJobStates>(
+                  listener: (context, state) {
+                    if (state is AddJobLoadedState) {
+                      _showSnackBar(
+                        context,
+                        'Job uploaded successfully!',
+                        Colors.green,
+                      );
+                      _formKey.currentState!.reset();
+                    }
+                    if (state is AddJobErrorState) {
+                      _showSnackBar(
+                        context,
+                        state.error,
+                        Colors.red,
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return Center(
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            Colors.blueAccent,
+                          ),
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            final AuthenticateUserSate userState = context
+                                .read<AuthUserBloc>()
+                                .state as AuthenticateUserSate;
+                            final String userId = userState.myAuthUser.userId;
+                            context.read<AddJobBloc>().add(
+                                  UploadJobEvent(
+                                    title: _title!,
+                                    dsc: _dsc!,
+                                    deadlineDate: _deadlineDate!,
+                                    userId: userId,
+                                    typeId: _typeId!,
+                                  ),
+                                );
+                          }
+                        },
+                        child: state is AddJobLoadingState
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'POST',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                ),
+                              ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

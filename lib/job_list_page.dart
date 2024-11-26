@@ -23,203 +23,194 @@ class JobListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<JobListPageBloc>().add(LoadJobListEvent(typeId: -1));
     context.read<JobTypesBloc>().add(LoadJobTypesEvent());
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'HireHub',
-            style: TextStyle(
-              fontFamily: 'Wet',
-              fontSize: 34,
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 40,
             ),
-          ),
-          backgroundColor: Colors.blue,
-          actions: [
-            BlocBuilder<JobTypesBloc, MyJobTypesStates>(
-              builder: (context, state) {
-                if (state is JobTypesLoadedState) {
-                  final List<Map<String, dynamic>> types =
-                      state.myjobTypesModel.jobTypes;
-                  types.add({
-                    'id': -1,
-                    'type_name': 'All',
-                  });
-                  return DropdownButton(
-                    hint: const Text(
-                      'Select Catagory',
-                    ),
-                    items: List.generate(types.length, (count) {
-                      return DropdownMenuItem(
-                        value: types[count]['id'],
-                        child: Text(
-                          types[count]['type_name'],
-                        ),
-                      );
-                    }),
-                    onChanged: (value) {
-                      final int id = value as int;
-                      context
-                          .read<JobListPageBloc>()
-                          .add(LoadJobListEvent(typeId: id));
-                    },
-                  );
-                }
-                return const CircularProgressIndicator();
-              },
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
-        body: BlocBuilder<JobListPageBloc, MyJobListPageStates>(
-          builder: (context, state) {
-            if (state is JobListErrorState) {
-              return Center(
-                child: Text(
-                  state.error,
-                ),
-              );
-            }
-            if (state is JobListLoadedState) {
-              final List<Map<String, dynamic>> jobs = state.myJobListModel.jobs;
-              return ListView.builder(
-                itemCount: jobs.length,
-                itemBuilder: (context, count) {
-                  return SizedBox(
-                    height: 190,
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.to(
-                          () => MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (context) => JobDetailBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => SendMailBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => JobCommentBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => PostJobCommentBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => SendMailValidityBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => ChangeJobIsActiveBloc(
-                                  homePageRepository:
-                                      context.read<HomePageRepository>(),
-                                ),
-                              )
-                            ],
-                            child: JobDetailsPage(
-                              jobId: jobs[count]['id'],
-                            ),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Image.network(
-                                jobs[count]['user_image_url'],
-                                width: 90,
-                                height: 90,
-                                fit: BoxFit.cover,
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    left: BorderSide(
-                                      width: 2,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      jobs[count]['title'],
-                                      style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      jobs[count]['type_name'],
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    Text(
-                                      jobs[count]['dsc'],
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 3,
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            }
-
-            if (state is JobListErrorState) {
-              return Center(
-                child: Text(
-                  state.error,
-                  style: const TextStyle(
-                    fontSize: 24,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        actions: [
+          BlocBuilder<JobTypesBloc, MyJobTypesStates>(
+            builder: (context, state) {
+              if (state is JobTypesLoadedState) {
+                final types = state.myjobTypesModel.jobTypes;
+                types.add({
+                  'id': -1,
+                  'type_name': 'All',
+                });
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: DropdownButton<int>(
+                    underline: Container(),
+                    hint: const Text('Select Category'),
+                    items: types.map((type) {
+                      return DropdownMenuItem<int>(
+                        value: type['id'] as int,
+                        child: Text(type['type_name']),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      context.read<JobListPageBloc>().add(
+                            LoadJobListEvent(typeId: value!),
+                          );
+                    },
                   ),
-                ),
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator(),
               );
-            }
-
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.blue,
+            },
+          ),
+        ],
+      ),
+      body: BlocBuilder<JobListPageBloc, MyJobListPageStates>(
+        builder: (context, state) {
+          if (state is JobListErrorState) {
+            return Center(
+              child: Text(
+                state.error,
+                style: const TextStyle(fontSize: 24),
               ),
             );
-          },
-        ));
+          }
+
+          if (state is JobListLoadedState) {
+            final jobs = state.myJobListModel.jobs;
+            return ListView.builder(
+              itemCount: jobs.length,
+              itemBuilder: (context, index) {
+                final job = jobs[index];
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => MultiBlocProvider(
+                        providers: [
+                          BlocProvider(
+                            create: (context) => JobDetailBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => SendMailBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => JobCommentBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => PostJobCommentBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => SendMailValidityBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => ChangeJobIsActiveBloc(
+                              homePageRepository:
+                                  context.read<HomePageRepository>(),
+                            ),
+                          ),
+                        ],
+                        child: JobDetailsPage(jobId: job['id']),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 3,
+                      horizontal: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              job['user_image_url'],
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  job['title'],
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  job['type_name'],
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  job['dsc'],
+                                  style: const TextStyle(fontSize: 16),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
   }
 }

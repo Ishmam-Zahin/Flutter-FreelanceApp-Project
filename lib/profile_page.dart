@@ -41,14 +41,25 @@ class ProfilePage extends StatelessWidget {
         .add(LoadJobListEvent(typeId: -1, userId: userId));
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 40,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: SingleChildScrollView(
         child: BlocBuilder<AuthUserBloc, UserState>(builder: (context, state) {

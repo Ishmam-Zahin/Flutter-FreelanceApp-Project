@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(
                 seedColor: const Color.fromARGB(255, 6, 0, 167),
               ),
-              scaffoldBackgroundColor: const Color.fromARGB(255, 222, 222, 222),
+              scaffoldBackgroundColor: const Color.fromARGB(255, 238, 238, 238),
               inputDecorationTheme: const InputDecorationTheme()),
           home: const AuthWrapper(),
         ),

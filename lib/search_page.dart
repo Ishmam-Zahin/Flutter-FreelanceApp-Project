@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freelance_app/bloc/blocs/delete_job_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/search_item_bloc.dart';
 import 'package:freelance_app/bloc/events/search_item_events.dart';
 import 'package:freelance_app/bloc/states/search_item_states.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
 import 'package:freelance_app/other_profile_page.dart';
-import 'package:freelance_app/profile_page.dart';
 import 'package:get/get.dart';
 
 class SearchPage extends StatefulWidget {
@@ -34,14 +32,25 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 40,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: BlocConsumer<SearchItemBloc, MySearchItemStates>(
         listener: (context, state) {
@@ -57,6 +66,7 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Search Field
               Form(
                 key: _searchFormKey,
                 child: TextFormField(
@@ -75,7 +85,6 @@ class _SearchPageState extends State<SearchPage> {
                     if (value == null || value == '') {
                       return 'Value can\'t be empty';
                     }
-
                     return null;
                   },
                   onSaved: (value) {
@@ -83,9 +92,8 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
+              // Search Button
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -96,12 +104,24 @@ class _SearchPageState extends State<SearchPage> {
                           );
                     }
                   },
-                  child: const Text('Search'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Search',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               const Text(
                 'Searched Items:',
                 style: TextStyle(
@@ -109,6 +129,7 @@ class _SearchPageState extends State<SearchPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              // Search Results
               state is SearchItemInitialState
                   ? const Center(child: Text('Search for companies'))
                   : Expanded(
@@ -125,36 +146,89 @@ class _SearchPageState extends State<SearchPage> {
                                     itemBuilder: (context, count) {
                                       final Map<String, dynamic> company =
                                           state.model.items[count];
-                                      return Card(
-                                        child: ListTile(
-                                          leading: Image.network(
-                                            company['image_url'],
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 1,
+                                        ),
+                                        child: Card(
+                                          elevation: 4,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
-                                          title: Text(
-                                            company['name'],
-                                          ),
-                                          subtitle: Text(
-                                            company['address'],
-                                          ),
-                                          trailing: TextButton(
-                                            onPressed: () {
-                                              Get.to(MultiBlocProvider(
-                                                providers: [
-                                                  BlocProvider(
-                                                    create: (context) =>
-                                                        JobListPageBloc(
-                                                      context.read<
-                                                          HomePageRepository>(),
+                                          child: ListTile(
+                                            contentPadding:
+                                                const EdgeInsets.all(15),
+                                            leading: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.network(
+                                                company['image_url'],
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.cover,
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      value: loadingProgress
+                                                                  .expectedTotalBytes !=
+                                                              null
+                                                          ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              (loadingProgress
+                                                                      .expectedTotalBytes ??
+                                                                  1)
+                                                          : null,
                                                     ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            title: Text(
+                                              company['name'],
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              company['address'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            trailing: TextButton(
+                                              onPressed: () {
+                                                Get.to(MultiBlocProvider(
+                                                  providers: [
+                                                    BlocProvider(
+                                                      create: (context) =>
+                                                          JobListPageBloc(
+                                                        context.read<
+                                                            HomePageRepository>(),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  child: OtherProfilePage(
+                                                    userData: company,
                                                   ),
-                                                ],
-                                                child: OtherProfilePage(
-                                                  userData: company,
+                                                ));
+                                              },
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.blue,
+                                              ),
+                                              child: const Text(
+                                                'View Profile',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              ));
-                                            },
-                                            child: const Text(
-                                              'View Profile',
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -164,7 +238,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                         ],
                       ),
-                    )
+                    ),
             ],
           ),
         ),

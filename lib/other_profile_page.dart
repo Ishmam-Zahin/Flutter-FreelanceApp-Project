@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:freelance_app/bloc/blocs/change_job_isactive_bloc.dart';
-import 'package:freelance_app/bloc/blocs/delete_job_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
@@ -8,11 +7,8 @@ import 'package:freelance_app/bloc/blocs/post_job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_validity_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
-import 'package:freelance_app/bloc/events/delete_job_events.dart';
 import 'package:freelance_app/bloc/events/job_list_page_events.dart';
-import 'package:freelance_app/bloc/events/user_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freelance_app/bloc/states/delete_job_states.dart';
 import 'package:freelance_app/bloc/states/job_list_page_states.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
@@ -39,10 +35,6 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthenticateUserSate userState =
-        context.read<AuthUserBloc>().state as AuthenticateUserSate;
-    final String authId = userState.myAuthUser.userId;
-
     final userData = widget.userData;
 
     context
@@ -51,14 +43,25 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HireHub',
-          style: TextStyle(
-            fontFamily: 'Wet',
-            fontSize: 34,
-          ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 40,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'HireHub',
+              style: TextStyle(
+                fontFamily: 'Wet', // Replace with the login page font family
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: SingleChildScrollView(
         child: BlocBuilder<AuthUserBloc, UserState>(builder: (context, state) {
