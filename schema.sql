@@ -1,3 +1,8 @@
+create table job_types(
+  id int primary key generated always as identity,
+  type_name varchar(100) not null
+);
+
 CREATE TABLE jobs(
   id bigint primary key generated always as identity,
   user_id uuid,
@@ -7,8 +12,9 @@ CREATE TABLE jobs(
   deadline_date date not null,
   dsc text not null,
   total_applicant int default 0,
-  foreign key (user_id) references auth.users(id),
-  foreign key (type_id) references job_types(id)
+  active boolean default true,
+  foreign key (user_id) references auth.users(id) on delete cascade,
+  foreign key (type_id) references job_types(id) on delete cascade
 );
 
 create table comments(
@@ -18,17 +24,23 @@ create table comments(
   com_time timestamp default current_timestamp,
   com_text varchar(200) not null,
   foreign key (user_id) references auth.users(id) on delete cascade,
-  foreign key (job_id) references jobs(id)
+  foreign key (job_id) references jobs(id) on delete cascade
 );
 
-create table job_types(
-  id int primary key generated always as identity,
-  type_name varchar(100) not null
+create table job_applicant(
+  user_id uuid,
+  job_id bigint,
+  apply_date date default current_date,
+  foreign key (user_id) references auth.users(id) on delete cascade,
+  foreign key (job_id) references jobs(id) on delete cascade
 );
 
 create view get_job_list as
 select A.id, A.user_id, A.active, C.id as type_id, C.type_name, A.title, A.dsc, A.deadline_date, B.raw_user_meta_data->'name' as user_name, B.raw_user_meta_data->'image_url' as user_image_url
 from (jobs as A join auth.users as B on A.user_id = B.id) join job_types as C on A.type_id = C.id;
+
+create view search_users as
+select id, email, raw_user_meta_data->>'name' as name, raw_user_meta_data->>'phone' as phone, raw_user_meta_data->>'address' as address, raw_user_meta_data->>'image_url' as image_url from auth.users;
 
 
 CREATE FUNCTION get_job_detail(j_id int)
@@ -69,14 +81,6 @@ BEGIN
     WHERE j.id = j_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
-create table job_applicant(
-  user_id uuid,
-  job_id bigint,
-  apply_date date default current_date,
-  foreign key (user_id) references auth.users(id) on delete cascade,
-  foreign key (job_id) references jobs(id) on delete cascade
-);
 
 create function auto_increment_applicant_num()
 returns trigger as

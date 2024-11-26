@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freelance_app/bloc/blocs/change_job_isactive_bloc.dart';
+import 'package:freelance_app/bloc/blocs/delete_job_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_detail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
@@ -7,9 +8,11 @@ import 'package:freelance_app/bloc/blocs/post_job_comment_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_bloc.dart';
 import 'package:freelance_app/bloc/blocs/send_mail_validity_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
+import 'package:freelance_app/bloc/events/delete_job_events.dart';
 import 'package:freelance_app/bloc/events/job_list_page_events.dart';
 import 'package:freelance_app/bloc/events/user_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freelance_app/bloc/states/delete_job_states.dart';
 import 'package:freelance_app/bloc/states/job_list_page_states.dart';
 import 'package:freelance_app/bloc/states/user_state.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
@@ -17,7 +20,16 @@ import 'package:freelance_app/job_details_page.dart';
 import 'package:get/get.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, Map<String, dynamic>? userData});
+
+  void _showErrorSnackBar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -318,18 +330,89 @@ class ProfilePage extends StatelessWidget {
                                           ],
                                         ),
                                       ),
-                                      ElevatedButton(
-                                        style: const ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStatePropertyAll(
-                                              Colors.red,
-                                            ),
-                                            iconColor: WidgetStatePropertyAll(
-                                                Colors.white)),
-                                        onPressed: () {
-                                          print('x');
+                                      BlocConsumer<DeleteJobBloc,
+                                          MyDeleteJobStates>(
+                                        listener: (context, state2) {
+                                          if (state2 is DeleteJobErrorSate) {
+                                            _showErrorSnackBar(
+                                                context,
+                                                'Failed to delete!',
+                                                Colors.red);
+                                          }
+                                          if (state2 is DeleteJobLoadedState) {
+                                            _showErrorSnackBar(
+                                                context,
+                                                'Job Deleted Successfully!',
+                                                Colors.green);
+                                            context.read<JobListPageBloc>().add(
+                                                LoadJobListEvent(
+                                                    typeId: -1,
+                                                    userId: userId));
+                                          }
                                         },
-                                        child: const Icon(Icons.delete_forever),
+                                        builder: (context, state2) {
+                                          int jobId =
+                                              (state as JobListLoadedState)
+                                                  .myJobListModel
+                                                  .jobs[count]['id'];
+                                          return ElevatedButton(
+                                            style: const ButtonStyle(
+                                                backgroundColor:
+                                                    WidgetStatePropertyAll(
+                                                  Colors.red,
+                                                ),
+                                                iconColor:
+                                                    WidgetStatePropertyAll(
+                                                        Colors.white)),
+                                            onPressed: () {
+                                              final bloc =
+                                                  context.read<DeleteJobBloc>();
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        'Delete Confirmation'),
+                                                    content: const Text(
+                                                        'Are you sure?'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          bloc.add(
+                                                              DeleteJobEvent(
+                                                                  jobId:
+                                                                      jobId));
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: const Text(
+                                                          'YES',
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: const Text(
+                                                          'NO',
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: const Icon(
+                                                Icons.delete_forever),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),

@@ -57,6 +57,9 @@ class _AddJobPageState extends State<AddJobPage> {
                 ),
                 child: Column(
                   children: [
+                    const SizedBox(
+                      height: 50,
+                    ),
                     const Text(
                       'Upload A New Work',
                       style: TextStyle(
@@ -65,7 +68,7 @@ class _AddJobPageState extends State<AddJobPage> {
                       ),
                     ),
                     const SizedBox(
-                      height: 20,
+                      height: 40,
                     ),
                     BlocBuilder<JobTypesBloc, MyJobTypesStates>(
                       builder: (context, state) {
@@ -122,6 +125,8 @@ class _AddJobPageState extends State<AddJobPage> {
                       height: 30,
                     ),
                     TextFormField(
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
                       decoration: const InputDecoration(
                         label: Text('Description'),
                       ),
@@ -175,6 +180,7 @@ class _AddJobPageState extends State<AddJobPage> {
                     'JOB UPLOADED SUCCESSFULLY!',
                     Colors.green,
                   );
+                  _formKey.currentState!.reset();
                 }
                 if (state is AddJobErrorState) {
                   _showSnackBar(

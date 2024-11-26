@@ -4,12 +4,14 @@ import 'package:freelance_app/auth_wrapper.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
 import 'package:freelance_app/data/providers/auth_user_provider.dart';
+import 'package:freelance_app/data/providers/delete_job_provider.dart';
 import 'package:freelance_app/data/providers/image_provider.dart';
 import 'package:freelance_app/data/providers/job_comments_provider.dart';
 import 'package:freelance_app/data/providers/job_detail_provider.dart';
 import 'package:freelance_app/data/providers/job_isActive_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
+import 'package:freelance_app/data/providers/search_provider.dart';
 import 'package:freelance_app/data/providers/send_mail_provider.dart';
 import 'package:freelance_app/data/repository/auth_user_repository.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
@@ -49,6 +51,8 @@ class MyApp extends StatelessWidget {
             mySendMailProvider: MySendMailProvider(),
             myJobCommentsProvider: MyJobCommentsProvider(),
             myJobIsActiveProvider: MyJobIsActiveProvider(),
+            deleteJobProvider: DeleteJobProvider(),
+            searchProvider: SearchProvider(),
           ),
         ),
       ],

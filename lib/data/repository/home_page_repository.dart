@@ -2,12 +2,15 @@ import 'package:freelance_app/data/model/job_comments_model.dart';
 import 'package:freelance_app/data/model/job_detail_model.dart';
 import 'package:freelance_app/data/model/job_list_model.dart';
 import 'package:freelance_app/data/model/jobs_types_model.dart';
+import 'package:freelance_app/data/model/search_item_model.dart';
 import 'package:freelance_app/data/providers/add_job_provider.dart';
+import 'package:freelance_app/data/providers/delete_job_provider.dart';
 import 'package:freelance_app/data/providers/job_comments_provider.dart';
 import 'package:freelance_app/data/providers/job_detail_provider.dart';
 import 'package:freelance_app/data/providers/job_isActive_provider.dart';
 import 'package:freelance_app/data/providers/job_list_provider.dart';
 import 'package:freelance_app/data/providers/job_types_provider.dart';
+import 'package:freelance_app/data/providers/search_provider.dart';
 import 'package:freelance_app/data/providers/send_mail_provider.dart';
 
 abstract class IHomePageRepository {
@@ -47,6 +50,10 @@ abstract class IHomePageRepository {
     required int jobId,
     required bool status,
   });
+
+  Future<void> deleteJob({required int jobId});
+
+  Future<SearchItemModel> searchItem({required name});
 }
 
 class HomePageRepository implements IHomePageRepository {
@@ -57,6 +64,8 @@ class HomePageRepository implements IHomePageRepository {
   final MySendMailProvider mySendMailProvider;
   final MyJobCommentsProvider myJobCommentsProvider;
   final MyJobIsActiveProvider myJobIsActiveProvider;
+  final DeleteJobProvider deleteJobProvider;
+  final SearchProvider searchProvider;
 
   HomePageRepository({
     required this.myJobListProvider,
@@ -66,6 +75,8 @@ class HomePageRepository implements IHomePageRepository {
     required this.mySendMailProvider,
     required this.myJobCommentsProvider,
     required this.myJobIsActiveProvider,
+    required this.deleteJobProvider,
+    required this.searchProvider,
   });
 
   @override
@@ -173,6 +184,24 @@ class HomePageRepository implements IHomePageRepository {
   }) async {
     try {
       await myJobIsActiveProvider.setJobActive(jobId: jobId, status: status);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteJob({required int jobId}) async {
+    try {
+      await deleteJobProvider.deleteJob(jobId: jobId);
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
+  @override
+  Future<SearchItemModel> searchItem({required name}) async {
+    try {
+      return await searchProvider.searchItem(name: name);
     } catch (e) {
       return Future.error(e.toString());
     }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:freelance_app/add_job_page.dart';
 import 'package:freelance_app/bloc/blocs/add_job_bloc.dart';
+import 'package:freelance_app/bloc/blocs/delete_job_bloc.dart';
 import 'package:freelance_app/bloc/blocs/home_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_list_page_bloc.dart';
 import 'package:freelance_app/bloc/blocs/job_types_bloc.dart';
+import 'package:freelance_app/bloc/blocs/search_item_bloc.dart';
 import 'package:freelance_app/bloc/blocs/user_bloc.dart';
 import 'package:freelance_app/bloc/events/home_page_events.dart';
 import 'package:freelance_app/bloc/events/user_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freelance_app/bloc/states/home_page_states.dart';
+import 'package:freelance_app/bloc/states/search_item_states.dart';
 import 'package:freelance_app/data/repository/home_page_repository.dart';
 import 'package:freelance_app/job_list_page.dart';
 import 'package:freelance_app/profile_page.dart';
@@ -34,13 +37,27 @@ class _HomePageState extends State<HomePage> {
                 create: (context) => JobListPageBloc(
                   context.read<HomePageRepository>(),
                 ),
+              ),
+              BlocProvider(
+                create: (context) => DeleteJobBloc(
+                  context.read<HomePageRepository>(),
+                ),
               )
             ],
             child: const ProfilePage(),
           );
         }
         if (state is ShowSearchPageState) {
-          return const SearchPage();
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => SearchItemBloc(
+                  homePageRepository: context.read<HomePageRepository>(),
+                ),
+              ),
+            ],
+            child: const SearchPage(),
+          );
         }
         if (state is ShowAddJobPageState) {
           return MultiBlocProvider(

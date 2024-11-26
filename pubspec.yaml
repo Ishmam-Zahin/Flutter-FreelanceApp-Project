@@ -39,6 +39,7 @@ dependencies:
   supabase_flutter: ^2.8.0
   flutter_bloc: ^8.1.6
   flutter_email_sender: ^6.0.3
+  icons_launcher: ^3.0.0
 
 dev_dependencies:
   flutter_test:

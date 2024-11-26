@@ -95,11 +95,14 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  job['title'],
-                                  style: const TextStyle(
-                                    fontSize: 28,
+                                Center(
+                                  child: Text(
+                                    job['title'],
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(
@@ -204,10 +207,13 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                const Text(
-                                  'Description',
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                const Center(
+                                  child: Text(
+                                    'Description',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(
@@ -215,7 +221,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                 ),
                                 Text(
                                   job['description'],
-                                  textAlign: TextAlign.center,
+                                  textAlign: TextAlign.start,
                                 ),
                                 const SizedBox(
                                   height: 10,
@@ -475,6 +481,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                               context,
                                               'Comment posted successfully!',
                                               Colors.green);
+
+                                          context.read<JobCommentBloc>().add(
+                                              LoadCommentsEvent(
+                                                  jobId: widget.jobId));
                                         }
 
                                         if (state is PostJobCommentErrorState) {
