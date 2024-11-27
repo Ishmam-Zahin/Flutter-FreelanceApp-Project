@@ -251,8 +251,16 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
-      validator: (value) =>
-          value == null || value.isEmpty ? 'This field can\'t be empty' : null,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'This field can\'t be empty';
+        }
+        if (obscureText && value.length < 8) {
+          return 'minimum 8 characters long';
+        }
+
+        return null;
+      },
       onSaved: onSaved,
     );
   }

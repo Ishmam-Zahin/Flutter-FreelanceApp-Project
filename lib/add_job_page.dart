@@ -160,6 +160,7 @@ class _AddJobPageState extends State<AddJobPage> {
                 const SizedBox(height: 20),
                 TextFormField(
                   decoration: const InputDecoration(
+                    hintText: 'yyyy-mm-dd',
                     labelText: 'Deadline Date',
                     border: OutlineInputBorder(),
                   ),
