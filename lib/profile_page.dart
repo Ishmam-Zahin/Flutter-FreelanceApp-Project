@@ -375,51 +375,60 @@ class ProfilePage extends StatelessWidget {
                                                 iconColor:
                                                     WidgetStatePropertyAll(
                                                         Colors.white)),
-                                            onPressed: () {
-                                              final bloc =
-                                                  context.read<DeleteJobBloc>();
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    title: const Text(
-                                                        'Delete Confirmation'),
-                                                    content: const Text(
-                                                        'Are you sure?'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          bloc.add(
-                                                              DeleteJobEvent(
-                                                                  jobId:
-                                                                      jobId));
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: const Text(
-                                                          'YES',
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: const Text(
-                                                          'NO',
-                                                          style: TextStyle(
-                                                            color: Colors.green,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
+                                            onPressed: state2
+                                                    is! DeleteJobLoadingState
+                                                ? () {
+                                                    final bloc = context
+                                                        .read<DeleteJobBloc>();
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                              'Delete Confirmation'),
+                                                          content: const Text(
+                                                              'Are you sure?'),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                bloc.add(
+                                                                    DeleteJobEvent(
+                                                                        jobId:
+                                                                            jobId));
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                'YES',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                'NO',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                : null,
                                             child: const Icon(
                                                 Icons.delete_forever),
                                           );

@@ -22,6 +22,7 @@ class _AddJobPageState extends State<AddJobPage> {
   String? _dsc;
   String? _deadlineDate;
   int? _typeId;
+  final TextEditingController _dateControler = TextEditingController();
 
   void _showSnackBar(BuildContext context, String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -30,6 +31,12 @@ class _AddJobPageState extends State<AddJobPage> {
         backgroundColor: color,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dateControler.dispose();
+    super.dispose();
   }
 
   @override
@@ -159,8 +166,21 @@ class _AddJobPageState extends State<AddJobPage> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
+                  controller: _dateControler,
+                  readOnly: true,
+                  onTap: () async {
+                    final DateTime? pickDate = await showDatePicker(
+                      context: context,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+
+                    if (pickDate != null) {
+                      _deadlineDate = pickDate!.toIso8601String().split('T')[0];
+                      _dateControler.text = _deadlineDate!;
+                    }
+                  },
                   decoration: const InputDecoration(
-                    hintText: 'yyyy-mm-dd',
                     labelText: 'Deadline Date',
                     border: OutlineInputBorder(),
                   ),
@@ -206,24 +226,27 @@ class _AddJobPageState extends State<AddJobPage> {
                             Colors.blueAccent,
                           ),
                         ),
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            final AuthenticateUserSate userState = context
-                                .read<AuthUserBloc>()
-                                .state as AuthenticateUserSate;
-                            final String userId = userState.myAuthUser.userId;
-                            context.read<AddJobBloc>().add(
-                                  UploadJobEvent(
-                                    title: _title!,
-                                    dsc: _dsc!,
-                                    deadlineDate: _deadlineDate!,
-                                    userId: userId,
-                                    typeId: _typeId!,
-                                  ),
-                                );
-                          }
-                        },
+                        onPressed: state is! AddJobLoadingState
+                            ? () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  final AuthenticateUserSate userState = context
+                                      .read<AuthUserBloc>()
+                                      .state as AuthenticateUserSate;
+                                  final String userId =
+                                      userState.myAuthUser.userId;
+                                  context.read<AddJobBloc>().add(
+                                        UploadJobEvent(
+                                          title: _title!,
+                                          dsc: _dsc!,
+                                          deadlineDate: _deadlineDate!,
+                                          userId: userId,
+                                          typeId: _typeId!,
+                                        ),
+                                      );
+                                }
+                              }
+                            : null,
                         child: state is AddJobLoadingState
                             ? const CircularProgressIndicator()
                             : const Text(

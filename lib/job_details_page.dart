@@ -514,6 +514,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                               context,
                                               'Comment posted successfully!',
                                               Colors.green);
+                                          _postCommentFormKey.currentState!
+                                              .reset();
                                           context.read<JobCommentBloc>().add(
                                               LoadCommentsEvent(
                                                   jobId: widget.jobId));
@@ -525,31 +527,38 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                                       },
                                       builder: (context, state) {
                                         return ElevatedButton(
-                                          onPressed: () {
-                                            if (_postCommentFormKey
-                                                .currentState!
-                                                .validate()) {
-                                              _postCommentFormKey.currentState!
-                                                  .save();
-                                              final AuthenticateUserSate
-                                                  userState = context
-                                                          .read<AuthUserBloc>()
-                                                          .state
-                                                      as AuthenticateUserSate;
-                                              final String userId =
-                                                  userState.myAuthUser.userId;
+                                          onPressed: state
+                                                  is! PostJobCommentLoadingState
+                                              ? () {
+                                                  if (_postCommentFormKey
+                                                      .currentState!
+                                                      .validate()) {
+                                                    _postCommentFormKey
+                                                        .currentState!
+                                                        .save();
+                                                    final AuthenticateUserSate
+                                                        userState = context
+                                                                .read<
+                                                                    AuthUserBloc>()
+                                                                .state
+                                                            as AuthenticateUserSate;
+                                                    final String userId =
+                                                        userState
+                                                            .myAuthUser.userId;
 
-                                              context
-                                                  .read<PostJobCommentBloc>()
-                                                  .add(
-                                                    PostCommentEvent(
-                                                      userId: userId,
-                                                      jobId: widget.jobId,
-                                                      comTxt: _comTxt!,
-                                                    ),
-                                                  );
-                                            }
-                                          },
+                                                    context
+                                                        .read<
+                                                            PostJobCommentBloc>()
+                                                        .add(
+                                                          PostCommentEvent(
+                                                            userId: userId,
+                                                            jobId: widget.jobId,
+                                                            comTxt: _comTxt!,
+                                                          ),
+                                                        );
+                                                  }
+                                                }
+                                              : null,
                                           style: ElevatedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 20),
